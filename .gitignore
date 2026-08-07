@@ -1,0 +1,38 @@
+# ========= VSCode 缓存 =========
+.vscode/!/.vscode/settings.json!/.vscode/c_cpp_properties.json
+*.code-workspace
+
+# ========= EIDE 编译缓存、产物 =========
+.eide/log
+.eide/*.ctx.json
+.eide/tmp
+*.elf
+*.hex
+*.bin
+*.map
+*.ept
+*.eide-template
+
+# ========= 编译输出目录 =========
+/build
+/bin
+/obj
+/out
+Debug/
+Release/
+
+# ========= CubeIDE / CubeMX 工程杂项 =========
+/.settings
+.mxproject/
+.cproject
+.project
+*.launch
+
+# ========= 系统临时文件 =========
+Thumbs.db
+.DS_Store
+*.bak
+*.swp
+*.swo
+*~
+*.log
