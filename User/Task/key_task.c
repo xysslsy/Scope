@@ -7,33 +7,31 @@
 
  #include "FreeRTOS.h"
  #include "task.h"
- #include "key.h"
- #include "main.h"
- #include "string.h"
-
- static KeyHandle_TypeDef hKey1;
-
- static void key1_ClickedCallback(void);
-
+#include "main.h"
+#include "key1.h"
+#include "key2.h"
+#include "key3.h"
+#include "key4.h"
+#include "key_up.h"
+#include "key_down.h"
 void keyTask(void *pvParameters)
 {
-    hKey1.GPIO_Port = KEY1_GPIO_Port;
-    hKey1.GPIO_Pin = KEY1_Pin;
-    hKey1.ClickedCallback = key1_ClickedCallback;
-
-   key_init(&hKey1);
+    key1_Init();
+    key2_Init();
+    key3_Init();
+    key4_Init();
+    keyUp_Init();
+    keyDown_Init();
 
     for(;;)
     {
-        key_scan(&hKey1);
-
+        key1_Scan();
+        key2_Scan();
+        key3_Scan();
+        key4_Scan();
+        keyUp_Scan();
+        keyDown_Scan();
         vTaskDelay(pdMS_TO_TICKS(10)); // Debounce delay
     }
 }
 
-static void key1_ClickedCallback(void)
-{
-    extern UART_HandleTypeDef huart1;
-
-    HAL_UART_Transmit(&huart1, (uint8_t *)"Key Pressed!\r\n", strlen("Key Pressed!\r\n"), HAL_MAX_DELAY);
-}

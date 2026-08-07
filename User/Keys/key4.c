@@ -1,0 +1,32 @@
+/*
+ * key4.c
+ *
+ *  Created on: Aug 7, 2026
+ *      Author: lqtghm
+ */
+
+#include "key.h"
+#include "string.h"
+
+static KeyHandle_TypeDef hKey4;
+static void key4_ClickedCallback(void);
+
+void key4_Init(void)
+{
+    hKey4.GPIO_Port = KEY4_GPIO_Port;
+    hKey4.GPIO_Pin = KEY4_Pin;
+    hKey4.ClickedCallback = key4_ClickedCallback;
+    key_init(&hKey4);
+}
+
+void key4_Scan(void)
+{
+    key_scan(&hKey4);
+}
+
+static void key4_ClickedCallback(void)
+{
+    extern UART_HandleTypeDef huart1;
+
+    HAL_UART_Transmit(&huart1, (uint8_t *)"Key4 Pressed!\r\n", strlen("Key4 Pressed!\r\n"), HAL_MAX_DELAY);
+}
