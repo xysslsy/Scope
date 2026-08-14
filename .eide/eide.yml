@@ -1,5 +1,5 @@
 version: "4.1"
-name: p1.3
+name: Scope
 type: ARM
 deviceName: null
 packDir: null
@@ -110,6 +110,7 @@ targets:
         - FreeRTOS/Inc
         - User/Task
         - Drivers
+        - User/Keys
       libList: []
     excludeList: []
     settings: {}

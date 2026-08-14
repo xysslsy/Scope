@@ -7,6 +7,7 @@
 
 #include "key.h"
 #include "string.h"
+#include "buzzer_task.h"
 
 static KeyHandle_TypeDef hKey4;
 static void key4_ClickedCallback(void);
@@ -26,7 +27,6 @@ void key4_Scan(void)
 
 static void key4_ClickedCallback(void)
 {
-    extern UART_HandleTypeDef huart1;
-
-    HAL_UART_Transmit(&huart1, (uint8_t *)"Key4 Pressed!\r\n", strlen("Key4 Pressed!\r\n"), HAL_MAX_DELAY);
+    Buzzer_Beep();
 }
+
