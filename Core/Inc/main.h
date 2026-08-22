@@ -75,6 +75,18 @@ void Error_Handler(void);
 #define KEY1_GPIO_Port GPIOC
 #define KEY2_Pin GPIO_PIN_8
 #define KEY2_GPIO_Port GPIOA
+#define LCD_RS_Pin GPIO_PIN_12
+#define LCD_RS_GPIO_Port GPIOC
+#define LCD_NSS_Pin GPIO_PIN_2
+#define LCD_NSS_GPIO_Port GPIOD
+#define LCD_SCK_Pin GPIO_PIN_3
+#define LCD_SCK_GPIO_Port GPIOB
+#define LCD_RST_Pin GPIO_PIN_4
+#define LCD_RST_GPIO_Port GPIOB
+#define LCD_MOSI_Pin GPIO_PIN_5
+#define LCD_MOSI_GPIO_Port GPIOB
+#define LCD_BL_Pin GPIO_PIN_6
+#define LCD_BL_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
