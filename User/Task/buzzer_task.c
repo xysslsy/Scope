@@ -16,7 +16,7 @@ void Buzzer_Init()
     xBuzzerSemphr = xSemaphoreCreateBinary();
 }
 
-void BuzzerTask(void *pvParameters)
+void vBuzzerTask(void *pvParameters)
 {
     for (;;)
     {

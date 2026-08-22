@@ -102,7 +102,8 @@ int main(void)
   LCDTask_Init();
 
   xTaskCreate(keyTask, "Key Task", 128, NULL, 3, NULL);
-  xTaskCreate(BuzzerTask, "Buzzer Task", 32, NULL, 1, NULL);
+  xTaskCreate(vBuzzerTask, "Buzzer Task", 32, NULL, 1, NULL);
+  xTaskCreate(vLCDTask, "LCD Task", 256, NULL, 1, NULL);
   vTaskStartScheduler();
   /* USER CODE END 2 */
 

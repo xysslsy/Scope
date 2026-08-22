@@ -6,11 +6,19 @@
  */
 
  #include "main.h"
+ #include "FreeRTOS.h"
+ #include "task.h"
+#include <stddef.h>
 
 static void BacklightControl(uint8_t on);
 static void Reset(void);
 static void SendCommand(uint8_t cmd);
 static void SendData(uint8_t *pData, uint16_t Size);
+static void SetRowRange(uint16_t startRow, uint16_t endRow);
+static void SetColumnRange(uint16_t startCol, uint16_t endCol);
+static void ShowImage(const uint16_t *pImage, size_t Size);
+static void ShowImage1(void);
+static void ShowImage2(void);
 
 void LCDTask_Init(void)
 {
@@ -27,32 +35,26 @@ void LCDTask_Init(void)
     dataToSend[0] = 0x55; // 16位颜色
     SendData(dataToSend, 1);
 
+    SendCommand(0x36); // 设置扫描方向和颜色顺序
+    dataToSend[0] = 0x80; // MY方向，RGB颜色顺序
+    SendData(dataToSend, 1);
+
     SendCommand(0x29); // 打开显示
+}
 
-    //设置行范围
-    SendCommand(0x2b); // 设置行地址
+//
+//@简介: LCD任务函数
+//
+void vLCDTask(void *pvParameters)
+{
+    for(;;)
+    {
+        ShowImage1(); // 显示图像1
+        vTaskDelay(pdMS_TO_TICKS(2000)); // 延时2秒
 
-    dataToSend[0] = 0x00; // 起始行高字节
-    dataToSend[1] = 0x9b; // 起始行低字节
-    dataToSend[2] = 0x00; // 结束行高字节
-    dataToSend[3] = 0xa4; // 结束行低字节
-    SendData(dataToSend, 4);
-
-    //设置列范围
-    SendCommand(0x2a); // 设置列地址
-    dataToSend[0] = 0x00; // 起始列高字节
-    dataToSend[1] = 0x73; // 起始列低字节
-    dataToSend[2] = 0x00; // 结束列高字节
-    dataToSend[3] = 0x7c; // 结束列低字节
-    SendData(dataToSend, 4);
-
-    //显示彩色小方块
-    SendCommand(0x2c); // 写内存开始
-
-    const uint16_t image[100] = {[0 ... 49] = 0x00f8, [50 ... 99] = 0xe007};
-
-    SendData((uint8_t *)image, sizeof(image));
-
+        ShowImage2(); // 显示图像2
+        vTaskDelay(pdMS_TO_TICKS(2000)); // 延时2秒
+    }
 }
 
 //
@@ -111,4 +113,75 @@ static void SendData(uint8_t *pData, uint16_t Size)
     HAL_GPIO_WritePin(LCD_NSS_GPIO_Port, LCD_NSS_Pin, GPIO_PIN_RESET); // 选中LCD
     HAL_SPI_Transmit(&hspi1, pData, Size, HAL_MAX_DELAY); // 发送数据
     HAL_GPIO_WritePin(LCD_NSS_GPIO_Port, LCD_NSS_Pin, GPIO_PIN_SET); // 取消选中LCD
+}
+
+//
+//@简介: 设置LCD的行范围
+//@参数: startRow: 起始行
+//@参数: endRow: 结束行
+//
+static void SetRowRange(uint16_t startRow, uint16_t endRow)
+{
+    uint8_t dataToSend[4];
+
+    SendCommand(0x2b); // 设置行地址
+
+    dataToSend[0] = (startRow >> 8) & 0xFF; // 高字节
+    dataToSend[1] = startRow & 0xFF; // 低字节
+    dataToSend[2] = (endRow >> 8) & 0xFF; // 高字节
+    dataToSend[3] = endRow & 0xFF; // 低字节
+    SendData(dataToSend, 4);
+}
+
+//
+//@简介: 设置LCD的列范围
+//@参数: startCol: 起始列
+//@参数: endCol: 结束列
+//
+static void SetColumnRange(uint16_t startCol, uint16_t endCol)
+{
+    uint8_t dataToSend[4];
+
+    SendCommand(0x2a); // 设置列地址
+
+    dataToSend[0] = (startCol >> 8) & 0xFF; // 高字节
+    dataToSend[1] = startCol & 0xFF; // 低字节
+    dataToSend[2] = (endCol >> 8) & 0xFF; // 高字节
+    dataToSend[3] = endCol & 0xFF; // 低字节
+    SendData(dataToSend, 4);
+}
+
+//
+//@简介: 显示图像到LCD
+//@参数: pImage: 要显示的图像的数据
+//@参数: Size: 图像数据大小
+//
+static void ShowImage(const uint16_t *pImage, size_t Size)
+{
+    SendCommand(0x2c); // 写内存开始
+    SendData((uint8_t *)pImage, (uint16_t)(Size * sizeof(*pImage)));
+}
+
+#include "image1.h"
+
+//
+//@简介: 显示图像1
+//
+static void ShowImage1(void)
+{
+     SetRowRange(80, 239); // 设置行范围
+    SetColumnRange(60, 193); // 设置列范围
+     ShowImage(image1, sizeof(image1) / sizeof(image1[0])); // 显示图像1
+}
+
+#include "image2.h"
+
+//
+//@简介: 显示图像2
+//
+static void ShowImage2(void)
+{
+    SetRowRange(80, 239); // 设置行范围
+    SetColumnRange(60, 221); // 设置列范围
+    ShowImage(image2, sizeof(image2) / sizeof(image2[0])); // 显示图像2
 }
