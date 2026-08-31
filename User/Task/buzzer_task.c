@@ -13,7 +13,8 @@ static SemaphoreHandle_t xBuzzerSemphr;
 
 void Buzzer_Init()
 {
-    xBuzzerSemphr = xSemaphoreCreateBinary();
+    // xBuzzerSemphr = xSemaphoreCreateBinary();
+    xBuzzerSemphr = xSemaphoreCreateCounting(10, 0); // 创建计数信号量，最大计数为10，初始计数为0
 }
 
 void vBuzzerTask(void *pvParameters)
