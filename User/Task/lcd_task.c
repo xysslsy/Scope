@@ -8,7 +8,9 @@
  #include "main.h"
  #include "FreeRTOS.h"
  #include "task.h"
-#include <stddef.h>
+ #include "semphr.h"
+
+ static SemaphoreHandle_t xSemaphrForDMA;
 
 static void BacklightControl(uint8_t on);
 static void Reset(void);
@@ -22,9 +24,17 @@ static void ShowImage2(void);
 
 void LCDTask_Init(void)
 {
+    xSemaphrForDMA = xSemaphoreCreateBinary();
+
     BacklightControl(1); // 打开背光
     Reset(); // 复位LCD
+}
 
+//
+//@简介: LCD任务函数
+//
+void vLCDTask(void *pvParameters)
+{
     uint8_t dataToSend[10];
 
     SendCommand(0x11); // 退出睡眠模式
@@ -40,13 +50,7 @@ void LCDTask_Init(void)
     SendData(dataToSend, 1);
 
     SendCommand(0x29); // 打开显示
-}
 
-//
-//@简介: LCD任务函数
-//
-void vLCDTask(void *pvParameters)
-{
     for(;;)
     {
         ShowImage1(); // 显示图像1
@@ -111,8 +115,26 @@ static void SendData(uint8_t *pData, uint16_t Size)
 
     HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_SET); // 设置为数据模式
     HAL_GPIO_WritePin(LCD_NSS_GPIO_Port, LCD_NSS_Pin, GPIO_PIN_RESET); // 选中LCD
-    HAL_SPI_Transmit(&hspi1, pData, Size, HAL_MAX_DELAY); // 发送数据
+    // HAL_SPI_Transmit(&hspi1, pData, Size, HAL_MAX_DELAY); // 发送数据
+    HAL_SPI_Transmit_DMA(&hspi1, pData, Size); // 使用DMA发送数据
+    xSemaphoreTake(xSemaphrForDMA, portMAX_DELAY); // 等待DMA传输完成
     HAL_GPIO_WritePin(LCD_NSS_GPIO_Port, LCD_NSS_Pin, GPIO_PIN_SET); // 取消选中LCD
+}
+
+//
+//@简介: SPI传输完成回调函数
+//@参数: hspi: SPI句柄指针
+//
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+    if(hspi->Instance == SPI1) // 检查是否为SPI1的回调
+    {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+        xSemaphoreGiveFromISR(xSemaphrForDMA, &xHigherPriorityTaskWoken); // 释放信号量
+        
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken); // 如果需要，切换任务
+    }
 }
 
 //
