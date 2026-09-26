@@ -33,6 +33,8 @@ targets:
         - User/Task
         - Drivers
         - User/Keys
+        - User
+        - User/GUI
       libList: []
     excludeList: []
     settings: {}
@@ -65,8 +67,8 @@ targets:
           linker:
             $outputTaskExcludes:
               - .bin
-            LD_FLAGS: "-L\"E:/FreeRTOS Worksapce/Scope/Drivers\""
-            LIB_FLAGS: "\"E:/FreeRTOS Worksapce/Scope/Drivers/lcd.a\""
+            LD_FLAGS: -L"E:/FreeRTOS Worksapce/Scope/Drivers"
+            LIB_FLAGS: '"E:/FreeRTOS Worksapce/Scope/Drivers/lcd.a"'
             output-format: elf
             remove-unused-input-sections: true
         scatterFilePath: STM32F103RCTX_FLASH.ld
@@ -110,6 +112,7 @@ targets:
         - User/Task
         - Drivers
         - User/Keys
+        - User
       libList: []
     excludeList: []
     settings: {}
@@ -142,8 +145,8 @@ targets:
           linker:
             $outputTaskExcludes:
               - .bin
-            LD_FLAGS: "-L\"E:/FreeRTOS Worksapce/Scope/Drivers\""
-            LIB_FLAGS: "\"E:/FreeRTOS Worksapce/Scope/Drivers/lcd.a\""
+            LD_FLAGS: -L"E:/FreeRTOS Worksapce/Scope/Drivers"
+            LIB_FLAGS: '"E:/FreeRTOS Worksapce/Scope/Drivers/lcd.a"'
             output-format: elf
             remove-unused-input-sections: true
         scatterFilePath: STM32F103RCTX_FLASH.ld

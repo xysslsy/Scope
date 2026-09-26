@@ -10,6 +10,7 @@
  #include "task.h"
  #include "semphr.h"
  #include "lcd.h"
+ #include "dmm_label.h"
 
  static SemaphoreHandle_t xSemaphrForDMA;
 
@@ -39,28 +40,10 @@ void vLCDTask(void *pvParameters)
 {
     lcd_clear(); // 清屏
 
-    //#1.绘制粉色标题背景
-    lcd_set_cursor(260, 8);
-    lcd_set_brush(0xff7bff); // 粉色
-    lcd_fill_rect(60,15);
-
-    //#2.绘制标题文字
-    lcd_set_cursor(262, 21);
-    lcd_set_pen(0x000000); // 黑色
-    lcd_print_string("Run Mode");
-
-    //#3.绘制面板背景
-    lcd_set_cursor(260, 23);
-    lcd_set_brush(0xcccccc); // 灰色
-    lcd_fill_rect(60, 35);
-
-    //#4.绘制面板文字
-    lcd_set_cursor(262, 43);
-    lcd_set_pen(0x000000); // 黑色
-    lcd_print_string("One-shot");
-
     for(;;)
     {
+        DMMLable1_Repaint(); // 重绘DMM标签
+
         vTaskDelay(pdMS_TO_TICKS(2000)); // 延时2秒
     }
 }
